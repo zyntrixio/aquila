@@ -4,3 +4,4 @@ __pycache__
 .env
 settings.ini
 .DS_Store
+dist

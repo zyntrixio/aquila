@@ -4,8 +4,8 @@ from flask import Blueprint, render_template, request
 from flask.templating import render_template_string
 from werkzeug.exceptions import NotFound
 
-from app.blob_storage import template_loader
-from app.utils import get_polaris_reward
+from aquila.blob_storage import template_loader
+from aquila.utils import get_polaris_reward
 
 bp = Blueprint("rewards", __name__, template_folder="templates")
 logger = logging.getLogger(__name__)

@@ -1,10 +1,10 @@
 [tool.poetry]
 name = "aquila"
-version = "0.1.0"
+version = "0.0.0"
 description = ""
 authors = ["Bink <bink@bink.bink>"]
 readme = "README.md"
-packages = [{include = "app"}]
+repository = "https://github.com/binkhq/aquila"
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -13,6 +13,8 @@ requests = "^2.28.1"
 azure-identity = "^1.10.0"
 azure-storage-blob = "^12.13.0"
 python-decouple = "^3.6"
+sentry-sdk = {extras = ["flask"], version = "^1.8.0"}
+gunicorn = "^20.1.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.6.0"
@@ -26,8 +28,11 @@ types-requests = "^2.28.3"
 ipython = "^8.4.0"
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core", "poetry-dynamic-versioning"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry-dynamic-versioning]
+enable = true
 
 [tool.black]
 line-length = 120
@@ -48,6 +53,9 @@ disallow_untyped_defs = true
 show_error_codes = true
 warn_unused_ignores = true
 ignore_missing_imports = true
+disallow_incomplete_defs = true
+warn_redundant_casts = true
+warn_unreachable = true
 
 [tool.pylint.MASTER]
 load-plugins=[
@@ -62,5 +70,18 @@ disable = [
     "missing-function-docstring",
     "missing-class-docstring",
     "too-few-public-methods",
+    "fixme",
 ]
-good-names=["k", "v", "i", "fn", "ex", "dt", "tz"]
+good-names=[
+    "k",  # key
+    "v",  # value
+    "fn", # function 
+    "ex", # exception 
+    "dt", # datetime 
+    "tz"  # timezone
+]
+
+[tool.coverage.run]
+omit = [
+    "tests/*",
+]

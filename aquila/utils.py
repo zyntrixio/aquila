@@ -2,20 +2,11 @@ import logging
 
 import requests
 
-from requests.adapters import HTTPAdapter, Retry
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, ServiceUnavailable
 
-from app.settings import POLARIS_BASE_URL
+from aquila.settings import POLARIS_BASE_URL
 
 logger = logging.getLogger(__name__)
-
-
-def request_with_retry() -> requests.Session:
-    session = requests.Session()
-    retries = Retry(total=3, backoff_factor=1, status_forcelist=[502, 503, 504])
-    session.mount("http://", HTTPAdapter(max_retries=retries))
-    session.mount("https://", HTTPAdapter(max_retries=retries))
-    return session
 
 
 def get_polaris_reward(retailer_slug: str, reward_id: str) -> dict:
@@ -26,10 +17,15 @@ def get_polaris_reward(retailer_slug: str, reward_id: str) -> dict:
         "code": "Reward redeeming code",
         "expiry_date": "2022-05-18",
         "template_slug": "name of template to use"
+        "pin": "Optional field"
     }
     """
+    try:
+        response = requests.get(f"{POLARIS_BASE_URL}/{retailer_slug}/reward/{reward_id}")
+    except Exception as ex:
+        logger.exception("Unable to reach polaris", exc_info=ex)
+        raise ServiceUnavailable from ex
 
-    response = request_with_retry().get(f"{POLARIS_BASE_URL}/{retailer_slug}/reward/{reward_id}")
     if response.status_code != 200:
         logger.info("Received negative response from polaris. Info: response: %s", response.text)
         raise NotFound

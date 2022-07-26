@@ -1,9 +1,13 @@
+import logging
+
 import requests
 
 from requests.adapters import HTTPAdapter, Retry
 from werkzeug.exceptions import NotFound
 
 from app.settings import POLARIS_BASE_URL
+
+logger = logging.getLogger(__name__)
 
 
 def request_with_retry() -> requests.Session:
@@ -27,6 +31,7 @@ def get_polaris_reward(retailer_slug: str, reward_id: str) -> dict:
 
     response = request_with_retry().get(f"{POLARIS_BASE_URL}/{retailer_slug}/reward/{reward_id}")
     if response.status_code != 200:
-        raise NotFound("nope")
+        logger.info("Received negative response from polaris. Info: response: %s", response.text)
+        raise NotFound
 
     return response.json()

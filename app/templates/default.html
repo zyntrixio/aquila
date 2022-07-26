@@ -1,0 +1,41 @@
+<!-- I AM A PLACEHOLDER, CHANGE ME PLEASE! -->
+<!DOCTYPE html>
+
+<head>
+    <title>Reward placeholder template</title>
+    <style>
+        h1 {
+            text-align: center;
+        }
+
+        #content {
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .center {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: 450px;
+        }
+    </style>
+</head>
+
+<body>
+    <section id="content">
+        <div>
+            <h1>Reward</h1>
+            <img src="http://placekitten.com/g/350/450" , class="center">
+        </div>
+
+        <div class="center">
+            <p><strong>Code:</strong> {{ code }}</p>
+            <p><strong>Expires On:</strong> {{ expiry_date }}</p>
+            {% if pin %}
+            <p><strong>PIN:</strong> {{ pin }}</p>
+            {% endif %}
+        </div>
+    </section>
+</body>

@@ -22,7 +22,7 @@ def reward() -> str:
     reward_data = get_polaris_reward(retailer_slug, reward_id)
     template_slug: str = reward_data.pop("template_slug", "N/A")
 
-    template = template_loader.get_template(template_slug)
+    template = template_loader.get_template(retailer_slug, template_slug)
     if template:
         logger.debug("rendering template from blob storage")
         return render_template_string(template, **reward_data)

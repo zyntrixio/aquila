@@ -11,7 +11,3 @@ def create_app() -> Flask:
     app.register_blueprint(healthz_bp)
 
     return app
-
-
-# TODO: tests
-# TODO: update bases/cosmos/polaris/core/lsp.yaml for polaris new endpoint

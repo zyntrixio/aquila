@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 def raise_not_found(retailer_slug: str) -> None:
-    error_template = template_loader.get_template(f"{retailer_slug}_error")
+    error_template = template_loader.get_template(retailer_slug, "error")
     if error_template:
         resp = Response(render_template_string(error_template))
     else:

@@ -14,7 +14,7 @@ PROJECT_PORT: int = config("PROJECT_PORT", default=5000, cast=int)
 DEBUG: bool = config("DEBUG", default=False, cast=bool)
 ROOT_LOG_LEVEL: str = config("ROOT_LOG_LEVEL", default="ERROR", cast=ALLOWED_LOG_LEVELS)
 LOG_FORMATTER: str = config("LOG_FORMATTER", default="json", cast=Choices(["brief", "json"]))
-TESTING: bool = config("TESTING", default=True, cast=bool)
+TESTING: bool = config("TESTING", default=False, cast=bool)
 
 POLARIS_HOST: str = config("POLARIS_HOST", default="http://polaris-api")
 POLARIS_PREFIX: str = config("POLARIS_PREFIX", default="/loyalty")

@@ -12,7 +12,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 class TemplateLoader:
-    _templates: dict = {}
+    _templates: dict[str, dict[str, str]] = {}
 
     def __init__(self) -> None:
         self.dont_fetch_templates = False
@@ -46,14 +46,25 @@ class TemplateLoader:
                 continue
 
             blob_client = self.container_client.get_blob_client(blob.name)
-            template_slug, extension = splitext(blob.name)
+            try:
+                retailer_slug, template_file = blob.name.split("/")
+                template_slug, extension = splitext(template_file)
+            except ValueError:
+                self.logger.warning(
+                    "wrong path for blob %s found in container %s, skipping.", blob.name, BLOB_CONTAINER
+                )
+                continue
+
             if extension == ".html":
                 try:
                     content = blob_client.download_blob().readall()
                     if isinstance(content, bytes):
                         content = content.decode("utf-8")
 
-                    self._templates[template_slug] = content
+                    if retailer_slug not in self._templates:
+                        self._templates[retailer_slug] = {}
+
+                    self._templates[retailer_slug][template_slug] = content
                 except (AttributeError, UnicodeDecodeError):
                     self.logger.exception(
                         "failed to decode file '%s' from container '%s'", blob.name, self.container_name
@@ -65,17 +76,23 @@ class TemplateLoader:
 
         self.logger.info("loaded template slugs: %s", list(self._templates))
 
-    def get_template(self, template_slug: str) -> str | None:  # pragma: no cover
+    def _get_template(self, retailer_slug: str, template_slug: str) -> str | None:
+        try:
+            return self._templates[retailer_slug][template_slug]
+        except KeyError:
+            return None
+
+    def get_template(self, retailer_slug: str, template_slug: str) -> str | None:  # pragma: no cover
         if self.dont_fetch_templates:
             self.logger.debug("TESTING set to %s, returning None", TESTING)
             return None
 
         self.logger.debug("available templates: %s, requested: %s", list(self._templates), template_slug)
-        template = self._templates.get(template_slug)
+        template = self._get_template(retailer_slug, template_slug)
         if not template:
             self.logger.info("template slug '%s' not found, trying to load templates again", template_slug)
             self._load_templates()
-            template = self._templates.get(template_slug)
+            template = self._get_template(retailer_slug, template_slug)
 
         return template
 

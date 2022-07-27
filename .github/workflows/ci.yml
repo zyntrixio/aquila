@@ -28,7 +28,7 @@ jobs:
       - run: black --check .
       - run: isort --check .
       - run: mypy .
-      - run: pylint aquila tests
+      - run: pylint aquila tests wsgi
       - run: pytest tests --verbose --cov=aquila --cov-report=xml --junitxml=report.xml
   release_dev:
     if: github.ref == 'refs/heads/develop' && github.event_name == 'push'

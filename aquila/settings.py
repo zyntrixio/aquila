@@ -1,11 +1,24 @@
+import sys
+
 from logging import NOTSET
 from logging.config import dictConfig
-from sys import argv, stderr, stdout
 
 import sentry_sdk
 
 from decouple import Choices, config
 from sentry_sdk.integrations.flask import FlaskIntegration
+
+
+def check_testing(value: bool) -> bool:
+    command = sys.argv[0]
+    if command == "poetry":
+        command = sys.argv[2] if len(sys.argv) > 2 else "None"
+
+    if "test" in command:
+        return True
+
+    return value
+
 
 ALLOWED_LOG_LEVELS = Choices(["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"])
 
@@ -14,7 +27,7 @@ PROJECT_PORT: int = config("PROJECT_PORT", default=5000, cast=int)
 DEBUG: bool = config("DEBUG", default=False, cast=bool)
 ROOT_LOG_LEVEL: str = config("ROOT_LOG_LEVEL", default="ERROR", cast=ALLOWED_LOG_LEVELS)
 LOG_FORMATTER: str = config("LOG_FORMATTER", default="json", cast=Choices(["brief", "json"]))
-TESTING: bool = config("TESTING", default=False, cast=bool)
+TESTING: bool = check_testing(config("TESTING", default=False, cast=bool))
 
 POLARIS_HOST: str = config("POLARIS_HOST", default="http://polaris-api")
 POLARIS_PREFIX: str = config("POLARIS_PREFIX", default="/loyalty")
@@ -47,13 +60,13 @@ dictConfig(
             "stderr": {
                 "level": NOTSET,
                 "class": "logging.StreamHandler",
-                "stream": stderr,
+                "stream": sys.stderr,
                 "formatter": LOG_FORMATTER,
             },
             "stdout": {
                 "level": NOTSET,
                 "class": "logging.StreamHandler",
-                "stream": stdout,
+                "stream": sys.stdout,
                 "formatter": LOG_FORMATTER,
             },
         },
@@ -70,10 +83,3 @@ dictConfig(
         },
     }
 )
-
-
-command = argv[0]
-args = argv[1:] if len(argv) > 1 else []
-
-if "pytest" in command or any("test" in arg for arg in args):
-    TESTING = True

@@ -11,7 +11,7 @@ from aquila.settings import POLARIS_BASE_URL
 logger = logging.getLogger(__name__)
 
 
-def raise_not_found(retailer_slug: str) -> None:
+def raise_template_error_response(retailer_slug: str) -> None:
     error_template = template_loader.get_template(retailer_slug, "error")
     if error_template:
         resp = Response(render_template_string(error_template))
@@ -36,7 +36,7 @@ def get_polaris_reward(retailer_slug: str, reward_id: str) -> dict:
         response = requests.get(f"{POLARIS_BASE_URL}/{retailer_slug}/reward/{reward_id}")
     except Exception:  # pylint: disable=broad-except
         logger.exception("Unable to reach polaris")
-        raise_not_found(retailer_slug)
+        raise_template_error_response(retailer_slug)
 
     if response.status_code != 200:
         logger.info(
@@ -47,6 +47,6 @@ def get_polaris_reward(retailer_slug: str, reward_id: str) -> dict:
         if response.status_code == 404:
             raise NotFound
 
-        raise_not_found(retailer_slug)
+        raise_template_error_response(retailer_slug)
 
     return response.json()

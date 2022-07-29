@@ -38,7 +38,7 @@ jobs:
     needs: [tests]
     steps:
       - uses: actions/checkout@v2
-      with:
+        with:
           fetch-depth: 0
       - run: echo "::set-output name=date::$(date +'%FT%H%M%SZ')"
         id: date
@@ -62,7 +62,7 @@ jobs:
     needs: [tests]
     steps:
       - uses: actions/checkout@v2
-      with:
+        with:
           fetch-depth: 0
       - name: tag_check
         run: |

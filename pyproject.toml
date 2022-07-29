@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aquila"
-version = "0.0.0"
+version = "0.0.0" # this is handled by poetry-dynamic-versioning leave as 0.0.0
 description = ""
 authors = ["Bink <bink@bink.bink>"]
 readme = "README.md"
@@ -36,6 +36,8 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry-dynamic-versioning]
 enable = true
+vcs = "git"
+pattern = '^((?P<epoch>\d+)!)?(?P<base>\d+(\.\d+)*)'
 
 [tool.black]
 line-length = 120
@@ -87,7 +89,6 @@ good-names=[
 omit = [
     "aquila/endpoints/healthz.py",
     "aquila/reporting.py",
-    # "aquila/blob_storage.py"
 ]
 
 [tool.coverage.report]

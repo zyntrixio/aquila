@@ -2,15 +2,16 @@ FROM ghcr.io/binkhq/python:3.10 as build
 
 WORKDIR /src
 
+RUN apt-get update && apt-get install -y git
 RUN pip install poetry==1.2.0b3
 RUN poetry config virtualenvs.create false
+RUN pip install poetry-dynamic-versioning-plugin    
 
 ADD . .
 RUN poetry build
 
 FROM ghcr.io/binkhq/python:3.10
-
-ARG wheel=aquila-0.0.0-py3-none-any.whl
+ARG wheel=aquila-*-py3-none-any.whl
 
 WORKDIR /app
 COPY --from=build /src/dist/$wheel .

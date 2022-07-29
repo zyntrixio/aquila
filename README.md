@@ -13,3 +13,7 @@ Microsite for providing access to reward's info to the end user.
 
 ## Usage
 - send http `GET` request to `[host][port]/reward?retailer=[retailer_slug]$reward=[reward_uuid]`
+
+## NB:
+- Aquila's `/readyz` endpoint will check for the existance of a `heathz` file in the blob storage and will try to contact polaris' `/livez` endpoint.
+- Aquila implements dynamic versioning so please leave the `__version__` set to `"0.0.0"`

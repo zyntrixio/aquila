@@ -11,7 +11,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from azure.storage.blob import ContainerClient
 
 
-class TemplateLoader:
+class TemplateLoader:  # pragma: no cover
     _templates: dict[str, dict[str, str]] = {}
 
     def __init__(self) -> None:
@@ -22,13 +22,13 @@ class TemplateLoader:
             self.dont_fetch_templates = True
             return
 
-        try:  # pragma: no cover
+        try:
             self.container_name = BLOB_CONTAINER
             # type hints are still somewhat broken for BlobServiceClient
             blob_service_client: Any = BlobServiceClient.from_connection_string(BLOB_STORAGE_DSN, logger=self.logger)
             self.container_client: "ContainerClient" = blob_service_client.get_container_client(self.container_name)
             self._load_templates()
-        except Exception:  # pylint: disable=broad-except  # pragma: no cover
+        except Exception:  # pylint: disable=broad-except
             self.dont_fetch_templates = True
             self.logger.exception(
                 (
@@ -38,7 +38,7 @@ class TemplateLoader:
                 BLOB_CONTAINER,
             )
 
-    def _load_templates(self) -> None:  # pragma: no cover
+    def _load_templates(self) -> None:
         self.logger.info("loading aquila templates from '%s'", self.container_name)
 
         for blob in self.container_client.list_blobs():
@@ -82,7 +82,7 @@ class TemplateLoader:
         except KeyError:
             return None
 
-    def get_template(self, retailer_slug: str, template_slug: str) -> str | None:  # pragma: no cover
+    def get_template(self, retailer_slug: str, template_slug: str) -> str | None:
         if self.dont_fetch_templates:
             self.logger.debug("TESTING set to %s, returning None", TESTING)
             return None

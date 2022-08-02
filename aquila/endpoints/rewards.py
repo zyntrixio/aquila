@@ -1,10 +1,10 @@
 import logging
 
-from flask import Blueprint, render_template, request
+from flask import Blueprint, abort, render_template, request
 from flask.templating import render_template_string
-from werkzeug.exceptions import BadRequest
 
 from aquila.blob_storage import template_loader
+from aquila.metrics import reward_requests_total
 from aquila.polaris_request import get_polaris_reward
 
 bp = Blueprint("rewards", __name__, template_folder="templates")
@@ -17,7 +17,10 @@ def reward() -> str:
     reward_id: str | None = request.args.get("reward")
     if not (retailer_slug and reward_id):
         logger.info("Missing required query params. Info: retailer: '%s', reward: '%s'", retailer_slug, reward_id)
-        raise BadRequest
+        reward_requests_total.labels(
+            retailer_slug=retailer_slug if retailer_slug else "N/A", response_status=400, response_template="N/A"
+        ).inc()
+        abort(400)
 
     reward_data = get_polaris_reward(retailer_slug, reward_id)
     template_slug: str = reward_data.pop("template_slug", "N/A")
@@ -25,7 +28,11 @@ def reward() -> str:
     template = template_loader.get_template(retailer_slug, template_slug)
     if template:
         logger.debug("rendering template from blob storage")
+        reward_requests_total.labels(
+            retailer_slug=retailer_slug, response_status=200, response_template=template_slug
+        ).inc()
         return render_template_string(template, **reward_data)
 
     logger.debug("template not found for '%s' falling back to default.html", template_slug)
+    reward_requests_total.labels(retailer_slug=retailer_slug, response_status=200, response_template="default").inc()
     return render_template("default.html", **reward_data)

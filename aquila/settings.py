@@ -1,3 +1,4 @@
+import secrets
 import sys
 
 from logging import NOTSET
@@ -20,6 +21,7 @@ def check_testing(value: bool) -> bool:
     return value
 
 
+SECRET_KEY = str(secrets.token_hex())
 ALLOWED_LOG_LEVELS = Choices(["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"])
 
 PROJECT_NAME: str = config("PROJECT_NAME", default="aquila")
@@ -37,6 +39,9 @@ POLARIS_BASE_URL = POLARIS_HOST + POLARIS_PREFIX
 BLOB_STORAGE_DSN: str = config("BLOB_STORAGE_DSN")
 BLOB_CONTAINER: str = config("BLOB_CONTAINER", default="aquila-templates")
 BLOB_LOGGING_LEVEL: str = config("BLOB_LOGGING_LEVEL", default="ERROR", cast=ALLOWED_LOG_LEVELS)
+
+METRICS_DEBUG: bool = config("METRICS_DEBUG", default=False, cast=bool)
+PROMETHEUS_MULTIPROC_DIR: str | None = config("PROMETHEUS_MULTIPROC_DIR", default=None)
 
 SENTRY_DSN: str | None = config("SENTRY_DSN", default=None)
 if SENTRY_DSN:  # pragma: no cover

@@ -11,6 +11,10 @@ Microsite for providing access to reward's info to the end user.
 - `BLOB_STORAGE_DSN` env var must be provided
 - `poetry run python wsgi.py`
 
+### Running with prometheus metrics:
+- run `PROMETHEUS_MULTIPROC_DIR=/tmp OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES gunicorn --bind=0.0.0.0:[PROJECT_PORT] --bind=0.0.0.0:9100 wsgi:app`
+- or run as normal with `METRICS_DEBUG` set to `True`
+
 ## Usage
 - send http `GET` request to `[host][port]/reward?retailer=[retailer_slug]$reward=[reward_uuid]`
 

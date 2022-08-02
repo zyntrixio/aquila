@@ -2,10 +2,10 @@ import logging
 
 import requests
 
-from flask import Response, render_template, render_template_string
-from werkzeug.exceptions import HTTPException, NotFound
+from flask import Response, abort, render_template, render_template_string
 
 from aquila.blob_storage import template_loader
+from aquila.metrics import reward_requests_total
 from aquila.settings import POLARIS_BASE_URL
 
 logger = logging.getLogger(__name__)
@@ -15,10 +15,14 @@ def raise_template_error_response(retailer_slug: str) -> None:
     error_template = template_loader.get_template(retailer_slug, "error")
     if error_template:
         resp = Response(render_template_string(error_template))
+        reward_requests_total.labels(retailer_slug=retailer_slug, response_status=200, response_template="error").inc()
     else:
         resp = Response(render_template("default_error.html"))
+        reward_requests_total.labels(
+            retailer_slug=retailer_slug, response_status=200, response_template="default_error"
+        ).inc()
 
-    raise HTTPException(response=resp)
+    abort(resp)
 
 
 def get_polaris_reward(retailer_slug: str, reward_id: str) -> dict:
@@ -45,7 +49,10 @@ def get_polaris_reward(retailer_slug: str, reward_id: str) -> dict:
             response.text,
         )
         if response.status_code == 404:
-            raise NotFound
+            reward_requests_total.labels(
+                retailer_slug=retailer_slug, response_status=404, response_template="N/A"
+            ).inc()
+            abort(404)
 
         raise_template_error_response(retailer_slug)
 

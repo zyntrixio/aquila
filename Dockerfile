@@ -18,6 +18,7 @@ COPY --from=build /src/dist/$wheel .
 COPY --from=build /src/wsgi.py .
 RUN pip install $wheel && rm $wheel
 
+ENV PROMETHEUS_MULTIPROC_DIR=/dev/shm
 ENTRYPOINT [ "linkerd-await", "--" ]
 CMD [ "gunicorn", "--workers=2", "--threads=2", "--error-logfile=-", \
     "--access-logfile=-", "--bind=0.0.0.0:9000", "--bind=0.0.0.0:9100", "wsgi:app" ]

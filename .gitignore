@@ -6,3 +6,4 @@ settings.ini
 .DS_Store
 dist
 .coverage
+.mypy_cache

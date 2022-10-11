@@ -32,7 +32,7 @@ def readyz() -> tuple[dict, int]:
 
     try:
         url = f"{POLARIS_HOST}/livez"
-        resp = requests.get(url)
+        resp = requests.get(url, timeout=(3.05, 10))
         resp.raise_for_status()
     except Exception as ex:  # pylint: disable=broad-except
         errors["polaris-request"] = f"failed to contact polaris at {url}: {repr(ex)}"

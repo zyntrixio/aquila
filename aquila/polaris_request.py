@@ -37,7 +37,7 @@ def get_polaris_reward(retailer_slug: str, reward_id: str) -> dict:
     }
     """
     try:
-        response = requests.get(f"{POLARIS_BASE_URL}/{retailer_slug}/reward/{reward_id}")
+        response = requests.get(f"{POLARIS_BASE_URL}/{retailer_slug}/reward/{reward_id}", timeout=(3.05, 10))
     except Exception:  # pylint: disable=broad-except
         logger.exception("Unable to reach polaris")
         raise_template_error_response(retailer_slug)

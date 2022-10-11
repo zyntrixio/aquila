@@ -1,4 +1,3 @@
-from datetime import date
 from typing import TYPE_CHECKING
 from uuid import uuid4
 
@@ -18,7 +17,7 @@ def test_reward_ok(test_client: "FlaskClient", mocker: MockerFixture) -> None:
     mock_metric = mocker.patch("aquila.endpoints.rewards.reward_requests_total")
 
     code = "TSTRWDCODE1234"
-    expiry_date = str(date.today())
+    expiry_date = "1999-12-31"
     pin = "1234"
 
     template = """
@@ -28,7 +27,7 @@ def test_reward_ok(test_client: "FlaskClient", mocker: MockerFixture) -> None:
     """
     expected_response = f"""
     <p>{ code }</p>
-    <p>{ expiry_date }</p>
+    <p>31/12/1999</p>
     <p>{ pin }</p>
     """
 
@@ -59,10 +58,10 @@ def test_reward_fallback_template(test_client: "FlaskClient", mocker: MockerFixt
     mock_metric = mocker.patch("aquila.endpoints.rewards.reward_requests_total")
 
     code = "TSTRWDCODE1234"
-    expiry_date = str(date.today())
+    expiry_date = "1999-12-31"
     pin = "1234"
 
-    expected_response = render_template("default.html", code=code, expiry_date=expiry_date, pin=pin)
+    expected_response = render_template("default.html", code=code, expiry_date="31/12/1999", pin=pin)
 
     retailer_slug = "test-retailer"
     reward_id = str(uuid4())

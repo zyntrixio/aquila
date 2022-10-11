@@ -1,5 +1,7 @@
 import logging
 
+from datetime import datetime
+
 from flask import Blueprint, abort, render_template, request
 from flask.templating import render_template_string
 
@@ -23,6 +25,7 @@ def reward() -> str:
         abort(400)
 
     reward_data = get_polaris_reward(retailer_slug, reward_id)
+    reward_data.update({"expiry_date": datetime.strptime(reward_data["expiry_date"], "%Y-%m-%d").strftime("%d/%m/%Y")})
     template_slug: str = reward_data.pop("template_slug", "N/A")
 
     template = template_loader.get_template(retailer_slug, template_slug)

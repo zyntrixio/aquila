@@ -2,9 +2,9 @@ name: ci
 
 on:
   push:
-    branches: [develop, master]
+    branches: [master]
   pull_request:
-    branches: [develop, master]
+    branches: [master]
   release:
     types: [published]
 
@@ -31,7 +31,7 @@ jobs:
       - run: pylint aquila tests wsgi
       - run: pytest tests --verbose --cov=aquila --cov-report=xml --junitxml=report.xml
   release_dev:
-    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    if: github.event_name == 'push'
     name: release_dev
     environment: development
     runs-on: ubuntu-latest

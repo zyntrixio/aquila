@@ -17,6 +17,25 @@ jobs:
       TESTING: "True"
       BLOB_STORAGE_DSN: "fake dsn"
     steps:
+      - uses: actions/checkout@v3
+      - uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: "."
+          security-checks: "vuln"
+          vuln-type: library
+          ignore-unfixed: true
+          exit-code: 0
+          severity: UNKNOWN,LOW,MEDIUM
+      - uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: "."
+          security-checks: "vuln"
+          vuln-type: library
+          ignore-unfixed: true
+          exit-code: 1
+          severity: HIGH,CRITICAL
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:

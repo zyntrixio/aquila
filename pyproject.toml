@@ -7,7 +7,7 @@ readme = "README.md"
 repository = "https://github.com/binkhq/aquila"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 Flask = "^2.1.3"
 requests = "^2.28.1"
 azure-storage-blob = "^12.13.0"
@@ -17,18 +17,18 @@ gunicorn = "^20.1.0"
 prometheus-client = "^0.14.1"
 
 [tool.poetry.group.dev.dependencies]
+ruff = "^0.0.252"
 black = "^22.6.0"
 isort = "^5.10.1"
 xenon = "^0.9.0"
-mypy = "^0.971"
-pylint = "^2.14.5"
-pytest = "^7.1.2"
-pylint-pytest = "^1.1.2"
+mypy = "^1.0.1"
+pytest = "^7.2.0"
 types-requests = "^2.28.3"
-ipython = "^8.4.0"
-responses = "^0.21.0"
+ipython = "^8.10.0"
+responses = "^0.22.0"
 pytest-mock = "^3.8.2"
-pytest-cov = "^3.0.0"
+pytest-cov = "^4.0.0"
+refurb = "^1.13.0"
 
 [build-system]
 requires = ["poetry-core", "poetry-dynamic-versioning"]
@@ -62,28 +62,60 @@ disallow_incomplete_defs = true
 warn_redundant_casts = true
 warn_unreachable = true
 
-[tool.pylint.MASTER]
-load-plugins=[
-    "pylint_pytest",
-    "pylint.extensions.mccabe"
+[tool.ruff]
+line-length = 120
+show-source = true
+target-version = "py310"
+select = [
+    "F",    # Pyflakes (F)
+    "E", 
+    "W",    # pycodestyle (E, W)
+    "C90",  # mccabe (C90)
+    # isort (I)
+    # pydocstyle (D)
+    "UP",   # pyupgrade (UP)
+    "N",    # pep8-naming (N)
+    "YTT",  # flake8-2020 (YTT)
+    "ANN",  # flake8-annotations (ANN)
+    "S",    # flake8-bandit (S)
+    "BLE",  # flake8-blind-except (BLE)
+    # flake8-boolean-trap (FBT)
+    "B",    # flake8-bugbear (B)
+    "A",    # flake8-builtins (A)
+    "C4",   # flake8-comprehensions (C4)
+    "T10",  # flake8-debugger (T10)
+    # flake8-errmsg (EM)
+    "ICN",  # flake8-import-conventions (ICN)
+    "T20",  # flake8-print (T20)
+    # "PT",   # flake8-pytest-style (PT)
+    "Q",    # flake8-quotes (Q)
+    # flake8-return (RET)
+    "SIM",  # flake8-simplify (SIM)
+    "TID",  # flake8-tidy-imports (TID)
+    "ARG",  # flake8-unused-arguments (ARG)
+    "DTZ",  # flake8-datetimez (DTZ)
+    # "ERA",  # eradicate (ERA) until we can remove commented out code this has to stay deactivated
+    # pandas-vet (PD)
+    # pygrep-hooks (PGH)
+    "PLC",
+    "PLE",
+    "PLR",
+    "PLW",  # Pylint (PLC, PLE, PLR, PLW)
+    "RUF",  # Ruff-specific rules (RUF)
+]
+ignore = [
+    "ANN101", 
+    "ANN102", 
+    # disables function call in function parameter error 
+    # arg = Depends(..) and arg = typer.Option(..) would be flagged
+    "B008",
+    "PLR2004" # disable Magic value used in comparison 
 ]
 
-[tool.pylint.messages_control]
-max-line-length = 120
-disable = [
-    "missing-module-docstring",
-    "missing-function-docstring",
-    "missing-class-docstring",
-    "too-few-public-methods",
-]
-good-names=[
-    "k",  # key
-    "v",  # value
-    "fn", # function 
-    "ex", # exception 
-    "dt", # datetime 
-    "tz"  # timezone
-]
+[tool.ruff.per-file-ignores]
+# disable unused import error for __init__.py and cosmos/db/base.py
+"__init__.py" = ["F401"]
+"tests/*" = ["S101", "PLR2004", "ARG001", "PLR0913", "PLR0915", "ARG002"]
 
 [tool.coverage.run]
 omit = [

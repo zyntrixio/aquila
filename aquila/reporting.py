@@ -3,10 +3,10 @@ import logging
 
 
 class JSONFormatter(logging.Formatter):
-    def __init__(self) -> None:  # pylint: disable=super-init-not-called
+    def __init__(self) -> None:
         pass
 
-    def format(self, record: logging.LogRecord) -> str:
+    def format(self, record: logging.LogRecord) -> str:  # noqa: A003
         return json.dumps(
             {
                 "timestamp": record.created,

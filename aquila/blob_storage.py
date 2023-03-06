@@ -57,7 +57,7 @@ class TemplateLoader:  # pragma: no cover
 
             if extension == ".html":
                 try:
-                    content = blob_client.download_blob().readall()
+                    content: str | bytes = blob_client.download_blob().readall()
                     if isinstance(content, bytes):
                         content = content.decode("utf-8")
 

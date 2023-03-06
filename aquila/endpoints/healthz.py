@@ -26,15 +26,15 @@ def readyz() -> tuple[dict, int]:
         blob_name = "healthz"
         blob_service_client: BlobServiceClient = BlobServiceClient.from_connection_string(BLOB_STORAGE_DSN)
         blob: "BlobClient" = blob_service_client.get_blob_client(BLOB_CONTAINER, blob_name)
-        assert blob.exists(), "blob does not exists"
-    except Exception as ex:  # pylint: disable=broad-except
-        errors["azure-blob-storage"] = f"failed to retrieve '{blob_name}' from '{BLOB_CONTAINER}': {repr(ex)}"
+        assert blob.exists(), "blob does not exists"  # noqa:  S101
+    except Exception as ex:  # noqa: BLE001
+        errors["azure-blob-storage"] = f"failed to retrieve '{blob_name}' from '{BLOB_CONTAINER}': {ex!r}"
 
     try:
         url = f"{POLARIS_HOST}/livez"
         resp = requests.get(url, timeout=(3.05, 10))
         resp.raise_for_status()
-    except Exception as ex:  # pylint: disable=broad-except
-        errors["polaris-request"] = f"failed to contact polaris at {url}: {repr(ex)}"
+    except Exception as ex:  # noqa: BLE001
+        errors["polaris-request"] = f"failed to contact polaris at {url}: {ex!r}"
 
     return errors, 500 if errors else 200

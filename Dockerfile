@@ -1,4 +1,4 @@
-FROM ghcr.io/binkhq/python:3.10 as build
+FROM ghcr.io/binkhq/python:3.11 as build
 
 WORKDIR /src
 
@@ -10,7 +10,7 @@ RUN pip install poetry-dynamic-versioning-plugin
 ADD . .
 RUN poetry build
 
-FROM ghcr.io/binkhq/python:3.10
+FROM ghcr.io/binkhq/python:3.11
 ARG wheel=aquila-*-py3-none-any.whl
 
 WORKDIR /app

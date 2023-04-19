@@ -6,15 +6,25 @@ from flask import Blueprint, abort, render_template, request
 from flask.templating import render_template_string
 
 from aquila.blob_storage import template_loader
+from aquila.fetch_reward import get_reward
 from aquila.metrics import reward_requests_total
-from aquila.polaris_request import get_polaris_reward
 
 bp = Blueprint("rewards", __name__, template_folder="templates")
 logger = logging.getLogger(__name__)
 
 
+@bp.get("/rewards")
 @bp.get("/reward")
 def reward() -> str:
+    """
+    Fetch reward from either Polaris or Cosmos.
+
+    The request destination for fetching the rewards is determined by the request
+    path.
+
+    /rewards -> Fetch reward from Cosmos
+    /reward -> Fetch reward from Polaris
+    """
     retailer_slug: str | None = request.args.get("retailer")
     reward_id: str | None = request.args.get("reward")
     if not (retailer_slug and reward_id):
@@ -26,7 +36,7 @@ def reward() -> str:
         ).inc()
         abort(400)
 
-    reward_data = get_polaris_reward(retailer_slug, reward_id)
+    reward_data = get_reward(retailer_slug, reward_id, request.path)
     reward_data.update(
         {
             "expiry_date": datetime.strptime(reward_data["expiry_date"], "%Y-%m-%d")

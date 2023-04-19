@@ -6,15 +6,29 @@ import responses
 from flask import render_template, url_for
 from pytest_mock import MockerFixture
 
-from aquila.settings import POLARIS_BASE_URL
+from aquila.settings import COSMOS_BASE_URL, POLARIS_BASE_URL
 
 if TYPE_CHECKING:
     from flask.testing import FlaskClient
 
 
+REQUEST_MAPPER = {
+    COSMOS_BASE_URL: "/rewards",
+    POLARIS_BASE_URL: "/reward",
+}
+
+
 @responses.activate
 def test_reward_ok(test_client: "FlaskClient", mocker: MockerFixture) -> None:
-    mock_metric = mocker.patch("aquila.endpoints.rewards.reward_requests_total")
+    """
+    This tests fetching reward from both POLARIS_BASE_URL and COSMOS_BASE_URL.
+
+    The request destination for fetching the rewards is determined by the request
+    path.
+
+    /rewards -> COSMOS_BASE_URL
+    /reward -> POLARIS_BASE_URL
+    """
 
     code = "TSTRWDCODE1234"
     expiry_date = "1999-12-31"
@@ -35,22 +49,26 @@ def test_reward_ok(test_client: "FlaskClient", mocker: MockerFixture) -> None:
     template_slug = "test-template"
     reward_id = str(uuid4())
 
-    responses.get(
-        f"{POLARIS_BASE_URL}/{retailer_slug}/reward/{reward_id}",
-        json={
-            "code": code,
-            "expiry_date": expiry_date,
-            "template_slug": template_slug,
-            "pin": pin,
-        },
-    )
-    mock_template_loader = mocker.patch("aquila.endpoints.rewards.template_loader")
-    mock_template_loader.get_template.return_value = template
-    resp = test_client.get(url_for("rewards.reward", retailer=retailer_slug, reward=reward_id))
-    assert resp.text == expected_response
-    mock_metric.labels.assert_called_once_with(
-        retailer_slug=retailer_slug, response_status=200, response_template=template_slug
-    )
+    for base_url, endpoint_path in REQUEST_MAPPER.items():
+        mock_metric = mocker.patch("aquila.endpoints.rewards.reward_requests_total")
+
+        responses.get(
+            f"{base_url}/{retailer_slug}/reward/{reward_id}",
+            json={
+                "code": code,
+                "expiry_date": expiry_date,
+                "template_slug": template_slug,
+                "pin": pin,
+            },
+        )
+        mock_template_loader = mocker.patch("aquila.endpoints.rewards.template_loader")
+        mock_template_loader.get_template.return_value = template
+        resp = test_client.get(f"{endpoint_path}?retailer={retailer_slug}&reward={reward_id}")
+        assert resp.text == expected_response
+
+        mock_metric.labels.assert_called_once_with(
+            retailer_slug=retailer_slug, response_status=200, response_template=template_slug
+        )
 
 
 @responses.activate
@@ -66,97 +84,103 @@ def test_reward_fallback_template(test_client: "FlaskClient", mocker: MockerFixt
     retailer_slug = "test-retailer"
     reward_id = str(uuid4())
 
-    responses.get(
-        f"{POLARIS_BASE_URL}/{retailer_slug}/reward/{reward_id}",
-        json={
-            "code": code,
-            "expiry_date": expiry_date,
-            "template_slug": "test-template",
-            "pin": pin,
-        },
-    )
-    mock_template_loader = mocker.patch("aquila.endpoints.rewards.template_loader")
-    mock_template_loader.get_template.return_value = None
-    resp = test_client.get(url_for("rewards.reward", retailer=retailer_slug, reward=reward_id))
-    assert resp.text == expected_response
-    mock_metric.labels.assert_called_once_with(
-        retailer_slug=retailer_slug, response_status=200, response_template="default"
-    )
+    for base_url, endpoint_path in REQUEST_MAPPER.items():
+        mock_metric = mocker.patch("aquila.endpoints.rewards.reward_requests_total")
+
+        responses.get(
+            f"{base_url}/{retailer_slug}/reward/{reward_id}",
+            json={
+                "code": code,
+                "expiry_date": expiry_date,
+                "template_slug": "test-template",
+                "pin": pin,
+            },
+        )
+        mock_template_loader = mocker.patch("aquila.endpoints.rewards.template_loader")
+        mock_template_loader.get_template.return_value = None
+        resp = test_client.get(f"{endpoint_path}?retailer={retailer_slug}&reward={reward_id}")
+        assert resp.text == expected_response
+        mock_metric.labels.assert_called_once_with(
+            retailer_slug=retailer_slug, response_status=200, response_template="default"
+        )
 
 
 def test_reward_missing_param(test_client: "FlaskClient", mocker: MockerFixture) -> None:
-    mock_metric = mocker.patch("aquila.endpoints.rewards.reward_requests_total")
+    for endpoint_path in REQUEST_MAPPER.values():
+        mock_metric = mocker.patch("aquila.endpoints.rewards.reward_requests_total")
 
-    resp = test_client.get(url_for("rewards.reward", reward="Stuff"))
-    assert resp.status_code == 400
-    mock_metric.labels.assert_called_with(retailer_slug="N/A", response_status=400, response_template="N/A")
+        resp = test_client.get(f"{endpoint_path}?reward=stuff")
+        assert resp.status_code == 400
+        mock_metric.labels.assert_called_with(retailer_slug="N/A", response_status=400, response_template="N/A")
 
-    resp = test_client.get(url_for("rewards.reward", retailer="stuff"))
-    assert resp.status_code == 400
-    mock_metric.labels.assert_called_with(retailer_slug="stuff", response_status=400, response_template="N/A")
+        resp = test_client.get(f"{endpoint_path}?retailer=stuff")
+        assert resp.status_code == 400
+        mock_metric.labels.assert_called_with(retailer_slug="stuff", response_status=400, response_template="N/A")
 
-    resp = test_client.get(url_for("rewards.reward"))
-    assert resp.status_code == 400
-    mock_metric.labels.assert_called_with(retailer_slug="N/A", response_status=400, response_template="N/A")
+        resp = test_client.get(f"{endpoint_path}")
+        assert resp.status_code == 400
+        mock_metric.labels.assert_called_with(retailer_slug="N/A", response_status=400, response_template="N/A")
 
 
 @responses.activate
-def test_reward_polaris_negative_responses(test_client: "FlaskClient", mocker: MockerFixture) -> None:
-    mock_metric = mocker.patch("aquila.polaris_request.reward_requests_total")
-
+def test_reward_negative_responses(test_client: "FlaskClient", mocker: MockerFixture) -> None:
     expected_response = render_template("default_error.html")
 
     retailer_slug = "test-retailer"
     reward_id = str(uuid4())
 
-    # Polaris returned a 404
-    responses.get(f"{POLARIS_BASE_URL}/{retailer_slug}/reward/{reward_id}", json={}, status=404)
+    for base_url, endpoint_path in REQUEST_MAPPER.items():
+        mock_metric = mocker.patch("aquila.fetch_reward.reward_requests_total")
 
-    resp = test_client.get(url_for("rewards.reward", retailer=retailer_slug, reward=reward_id))
-    assert resp.status_code == 404
-    mock_metric.labels.assert_called_with(retailer_slug=retailer_slug, response_status=404, response_template="N/A")
+        # Polaris / Cosmos returned a 404
+        responses.get(f"{base_url}/{retailer_slug}/reward/{reward_id}", json={}, status=404)
 
-    # Polaris returned a non 404 error state
-    responses.get(f"{POLARIS_BASE_URL}/{retailer_slug}/reward/{reward_id}", json={}, status=500)
+        resp = test_client.get(f"{endpoint_path}?retailer={retailer_slug}&reward={reward_id}")
+        assert resp.status_code == 404
+        mock_metric.labels.assert_called_with(retailer_slug=retailer_slug, response_status=404, response_template="N/A")
 
-    resp = test_client.get(url_for("rewards.reward", retailer=retailer_slug, reward=reward_id))
-    assert resp.text == expected_response
-    mock_metric.labels.assert_called_with(
-        retailer_slug=retailer_slug, response_status=200, response_template="default_error"
-    )
+        # Polaris / Cosmos  returned a non 404 error state
+        responses.get(f"{base_url}/{retailer_slug}/reward/{reward_id}", json={}, status=500)
 
-    # an exception happened while trying to contact polaris
-    mock_requests = mocker.patch("aquila.polaris_request.requests")
-    mock_requests.get.side_effect = Exception("random stuff happened")
+        resp = test_client.get(f"{endpoint_path}?retailer={retailer_slug}&reward={reward_id}")
+        assert resp.text == expected_response
+        mock_metric.labels.assert_called_with(
+            retailer_slug=retailer_slug, response_status=200, response_template="default_error"
+        )
 
-    resp = test_client.get(url_for("rewards.reward", retailer=retailer_slug, reward=reward_id))
-    assert resp.text == expected_response
-    mock_metric.labels.assert_called_with(
-        retailer_slug=retailer_slug, response_status=200, response_template="default_error"
-    )
+        # an exception happened while trying to contact Polaris / Cosmos
+        mock_requests = mocker.patch("aquila.fetch_reward.reward_requests_total")
+        mock_requests.get.side_effect = Exception("random stuff happened")
+
+        resp = test_client.get(f"{endpoint_path}?retailer={retailer_slug}&reward={reward_id}")
+        assert resp.text == expected_response
+        mock_metric.labels.assert_called_with(
+            retailer_slug=retailer_slug, response_status=200, response_template="default_error"
+        )
 
 
 @responses.activate
-def test_reward_polaris_negative_response_retailer_error_template(
-    test_client: "FlaskClient", mocker: MockerFixture
-) -> None:
-    mock_metric = mocker.patch("aquila.polaris_request.reward_requests_total")
-
-    # Polaris returned a non 404 error state and there is a retailer specific template
+def test_reward_negative_response_retailer_error_template(test_client: "FlaskClient", mocker: MockerFixture) -> None:
+    # Polaris / Cosmos returned a non 404 error state and there is a retailer specific template
     retailer_slug = "test-retailer"
     reward_id = str(uuid4())
     retailer_error_template = """
     No reward for you, but here's a potato.
     """
 
-    responses.get(f"{POLARIS_BASE_URL}/{retailer_slug}/reward/{reward_id}", json={}, status=500)
-    mock_template_loader = mocker.patch("aquila.polaris_request.template_loader")
-    mock_template_loader.get_template.return_value = retailer_error_template
+    for base_url, endpoint_path in REQUEST_MAPPER.items():
+        mock_metric = mocker.patch("aquila.fetch_reward.reward_requests_total")
 
-    resp = test_client.get(url_for("rewards.reward", retailer=retailer_slug, reward=reward_id))
-    assert resp.text == retailer_error_template
+        responses.get(f"{base_url}/{retailer_slug}/reward/{reward_id}", json={}, status=500)
+        mock_template_loader = mocker.patch("aquila.fetch_reward.template_loader")
+        mock_template_loader.get_template.return_value = retailer_error_template
 
-    mock_metric.labels.assert_called_with(retailer_slug=retailer_slug, response_status=200, response_template="error")
+        resp = test_client.get(f"{endpoint_path}?retailer={retailer_slug}&reward={reward_id}")
+        assert resp.text == retailer_error_template
+
+        mock_metric.labels.assert_called_with(
+            retailer_slug=retailer_slug, response_status=200, response_template="error"
+        )
 
 
 def test_metrics_ok(test_client: "FlaskClient", mocker: MockerFixture) -> None:

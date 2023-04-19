@@ -6,7 +6,7 @@ from flask import Response, abort, render_template, render_template_string
 
 from aquila.blob_storage import template_loader
 from aquila.metrics import reward_requests_total
-from aquila.settings import POLARIS_BASE_URL
+from aquila.settings import COSMOS_BASE_URL, POLARIS_BASE_URL
 
 logger = logging.getLogger(__name__)
 
@@ -25,9 +25,9 @@ def raise_template_error_response(retailer_slug: str) -> None:
     abort(resp)
 
 
-def get_polaris_reward(retailer_slug: str, reward_id: str) -> dict:
+def get_reward(retailer_slug: str, reward_id: str, request_path: str) -> dict:
     """
-    expected response payload from polaris will be:
+    expected response payload from polaris/cosmos will be:
     ```json
     {
         "code": "Reward redeeming code",
@@ -36,15 +36,23 @@ def get_polaris_reward(retailer_slug: str, reward_id: str) -> dict:
         "pin": "Optional field"
     }
     """
+    match request_path:
+        case "/rewards":
+            service = "cosmos"
+            base_url = COSMOS_BASE_URL
+        case "/reward":
+            service = "polaris"
+            base_url = POLARIS_BASE_URL
+
     try:
-        response = requests.get(f"{POLARIS_BASE_URL}/{retailer_slug}/reward/{reward_id}", timeout=(3.05, 10))
+        response = requests.get(f"{base_url}/{retailer_slug}/reward/{reward_id}", timeout=(3.05, 10))
     except Exception:  # pylint: disable=broad-except
-        logger.exception("Unable to reach polaris")
+        logger.exception(f"Unable to reach {service}")
         raise_template_error_response(retailer_slug)
 
     if response.status_code != 200:
         logger.info(
-            "Received a negative response from polaris. Info: status: %d, response: %s",
+            f"Received a negative response from {service}. Info: status: %d, response: %s",
             response.status_code,
             response.text,
         )

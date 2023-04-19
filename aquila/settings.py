@@ -34,6 +34,9 @@ TESTING: bool = check_testing(config("TESTING", default=False, cast=bool))
 POLARIS_HOST: str = config("POLARIS_HOST", default="http://polaris-api")
 POLARIS_PREFIX: str = config("POLARIS_PREFIX", default="/loyalty")
 POLARIS_BASE_URL = POLARIS_HOST + POLARIS_PREFIX
+COSMOS_HOST: str = config("COSMOS_HOST", default="http://cosmos-public-api")
+COSMOS_PREFIX: str = config("COSMOS_PREFIX", default="/api/public")
+COSMOS_BASE_URL = COSMOS_HOST + COSMOS_PREFIX
 
 
 BLOB_STORAGE_DSN: str = config("BLOB_STORAGE_DSN")

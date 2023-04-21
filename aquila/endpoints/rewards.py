@@ -13,7 +13,7 @@ bp = Blueprint("rewards", __name__, template_folder="templates")
 logger = logging.getLogger(__name__)
 
 
-@bp.get("/rewards")
+@bp.get("/r")
 @bp.get("/reward")
 def reward() -> str:
     """
@@ -22,7 +22,7 @@ def reward() -> str:
     The request destination for fetching the rewards is determined by the request
     path.
 
-    /rewards -> Fetch reward from Cosmos
+    /r -> Fetch reward from Cosmos
     /reward -> Fetch reward from Polaris
     """
     retailer_slug: str | None = request.args.get("retailer")

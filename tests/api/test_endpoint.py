@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 REQUEST_MAPPER = {
-    COSMOS_BASE_URL: "/rewards",
+    COSMOS_BASE_URL: "/r",
     POLARIS_BASE_URL: "/reward",
 }
 
@@ -26,7 +26,7 @@ def test_reward_ok(test_client: "FlaskClient", mocker: MockerFixture) -> None:
     The request destination for fetching the rewards is determined by the request
     path.
 
-    /rewards -> COSMOS_BASE_URL
+    /r -> COSMOS_BASE_URL
     /reward -> POLARIS_BASE_URL
     """
 

@@ -37,7 +37,7 @@ def get_reward(retailer_slug: str, reward_id: str, request_path: str) -> dict:
     }
     """
     match request_path:
-        case "/rewards":
+        case "/r":
             service = "cosmos"
             base_url = COSMOS_BASE_URL
         case "/reward":

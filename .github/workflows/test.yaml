@@ -1,0 +1,31 @@
+name: test
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    env:
+      LOG_FORMATTER: brief
+      TESTING: "True"
+      BLOB_STORAGE_DSN: "fake dsn"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install poetry
+      - run: poetry config virtualenvs.create false
+      - run: poetry install
+      - run: xenon --no-assert --max-average A --max-modules B --max-absolute B .
+      - run: black --check .
+      - run: isort --check .
+      - run: ruff aquila tests wsgi.py
+      - run: refurb aquila tests wsgi.py
+      - run: mypy .
+      - run: pytest tests --verbose --cov=aquila --cov-report=xml --junitxml=report.xml

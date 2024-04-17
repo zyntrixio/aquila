@@ -27,7 +27,7 @@ prometheus-client = "^0.14.1"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.0.252"
-black = "^22.6.0"
+black = "^24.3.0"
 isort = "^5.10.1"
 xenon = "^0.9.0"
 mypy = "^1.0.1"

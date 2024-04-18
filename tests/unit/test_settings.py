@@ -15,5 +15,5 @@ def test_check_testing(mocker: MockerFixture) -> None:
     assert check_testing(True)
 
     mock_sys.argv = ["other", "args"]
-    assert check_testing(False) is False
+    assert not check_testing(False)
     assert check_testing(True)

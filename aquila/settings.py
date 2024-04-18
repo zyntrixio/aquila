@@ -1,11 +1,9 @@
 import secrets
 import sys
-
 from logging import NOTSET
 from logging.config import dictConfig
 
 import sentry_sdk
-
 from decouple import Choices, config
 from sentry_sdk.integrations.flask import FlaskIntegration
 
@@ -21,7 +19,7 @@ def check_testing(value: bool) -> bool:
     return value
 
 
-SECRET_KEY = str(secrets.token_hex())
+SECRET_KEY = secrets.token_hex()
 ALLOWED_LOG_LEVELS = Choices(["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"])
 
 PROJECT_NAME: str = config("PROJECT_NAME", default="aquila")

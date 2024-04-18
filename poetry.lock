@@ -1083,13 +1083,13 @@ mando = ">=0.6,<0.7"
 
 [[package]]
 name = "refurb"
-version = "1.15.0"
+version = "1.28.0"
 description = "A tool for refurbish and modernize Python codebases"
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "refurb-1.15.0-py3-none-any.whl", hash = "sha256:90eac74c08f0fcdbde89acfebd0d82d727c1afa2a110acb43486bc5e7a92018d"},
-    {file = "refurb-1.15.0.tar.gz", hash = "sha256:be18dc5898e0d66812c6299aa777b2560c8d7dae543ff4456e83c9a12bd6af40"},
+    {file = "refurb-1.28.0-py3-none-any.whl", hash = "sha256:c89516b77745df67a1fc099e876bf31fe41ac48b80d1e7c8ced29aae902343ae"},
+    {file = "refurb-1.28.0.tar.gz", hash = "sha256:9fb4dc340e475818a4d2a7f274c77b81861d2ed8115a3f4fabff53e0ee350aa1"},
 ]
 
 [package.dependencies]

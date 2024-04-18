@@ -18,12 +18,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
       - run: pip install poetry
       - run: poetry install
       - run: poetry run xenon --no-assert --max-average A --max-modules B --max-absolute B .
       - run: poetry run ruff check .
       - run: poetry run ruff format --check .
-      - run: poetry run refurb aquila tests wsgi.py
+      - run: poetry run refurb .
       - run: poetry run mypy .
       - run: poetry run pytest tests --verbose --cov=aquila --cov-report=xml --junitxml=report.xml

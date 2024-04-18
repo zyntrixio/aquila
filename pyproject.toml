@@ -16,7 +16,7 @@ url = "https://pkgs.dev.azure.com/binkhq/_packaging/binkhq/pypi/simple/"
 priority = "explicit"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.12"
 flask = "<3"
 requests = "^2.31.0"
 azure-storage-blob = "^12.19.1"

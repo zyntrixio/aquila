@@ -6,7 +6,7 @@ class JSONFormatter(logging.Formatter):
     def __init__(self) -> None:
         pass
 
-    def format(self, record: logging.LogRecord) -> str:  # noqa: A003
+    def format(self, record: logging.LogRecord) -> str:
         return json.dumps(
             {
                 "timestamp": record.created,

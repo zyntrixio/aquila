@@ -22,9 +22,8 @@ jobs:
       - run: pip install poetry
       - run: poetry install
       - run: poetry run xenon --no-assert --max-average A --max-modules B --max-absolute B .
-      - run: poetry run black --check .
-      - run: poetry run isort --check .
-      - run: poetry run ruff aquila tests wsgi.py
+      - run: poetry run ruff check .
+      - run: poetry run ruff format --check .
       - run: poetry run refurb aquila tests wsgi.py
       - run: poetry run mypy .
       - run: poetry run pytest tests --verbose --cov=aquila --cov-report=xml --junitxml=report.xml

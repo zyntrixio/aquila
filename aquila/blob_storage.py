@@ -1,7 +1,6 @@
 import logging
-
 from os.path import splitext
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from azure.storage.blob import BlobServiceClient
 
@@ -12,7 +11,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 class TemplateLoader:  # pragma: no cover
-    _templates: dict[str, dict[str, str]] = {}
+    _templates: ClassVar[dict[str, dict[str, str]]] = {}
 
     def __init__(self) -> None:
         self.dont_fetch_templates = False

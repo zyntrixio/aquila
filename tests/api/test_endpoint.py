@@ -117,7 +117,7 @@ def test_reward_missing_param(test_client: "FlaskClient", mocker: MockerFixture)
         assert resp.status_code == 400
         mock_metric.labels.assert_called_with(retailer_slug="stuff", response_status=400, response_template="N/A")
 
-        resp = test_client.get(f"{endpoint_path}")
+        resp = test_client.get(endpoint_path)
         assert resp.status_code == 400
         mock_metric.labels.assert_called_with(retailer_slug="N/A", response_status=400, response_template="N/A")
 

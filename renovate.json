@@ -2,5 +2,18 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended"
+  ],
+  "reviewers": [
+    "team:developers"
+  ],
+  "hostRules": [
+    {
+      "hostType": "pypi",
+      "matchHost": "pkgs.dev.azure.com",
+      "username": "jeff",
+      "encrypted": {
+        "password": "wcFMA/xDdHCJBTolAQ/9HQLKjtADJTk+GnAvLsQbZr8GT4s2PR0RzmGhpx3J/5ILFB+9zwK6eV6RYNzg5wjTz6cVX0b8jG2cYiilR7iaN9PZo7tlyIGMc7QixE7kc7T3FucQPjNLdIT/nCxFGEQM2Fe1ohiZO3BFOIsAq8qs1mwqEvfUYVB6EeinlxkGinog+fjxrT4ET5dGcVBZMhDaFOs+fiWYpMCsdd/KV/q2Z6xWKGfPSQubUzv5zyI7+/unlVo0IcJNytlSoKZTdPMfxXT5OnxPqNTbMsogImWfw4JjFQLj4gtnFYu4gnOJqi3hGhnMG6oBh3GfhEhwju7O02UxqunionykUgK9iJw27DS23xPhnlG4179lsZkTFBd25sllSPhiEgEQJEjC9Mlll+MteYfOCU+lCUmKpCPXnmJydXbY30Xkg3IyVjB16Jzui9GF5KIS/rXBhsqqKCgrIa2Zw8XNxzypPG0zFDjE2Xa3OtgZ1vkLXE9EQjItuA/E4D5a47kU3KJB5nymDX4CJWKs/M6OpdiyIHeOVe0ypO1SFuVsJAPp3BN2Ge9JWk779P5McdQhOp2mXqrcxILF3iUq65+TDYOwtItQgJjtkY6Bt5dlRt9Od/wDfoQgqheSsfcPG2vd2YE+OMaDTAMuMoVUk+4XXvsXth3GHhwqR6eoNSJo/PYekqNT+92+iRXSgQHI9KsLirC9cSe8Q4Yx5VbZfXuCtnY3hM2XzKvLLZC67xCuidn1wbF7zXylmjc1jscSn/X8YZLzeGCYXsIeqjfYhB/pGLcYY9mP/M45R3KLKy+Tevg7IqJb4ENTMf6Sw2B7GYIr6CktVoU1UVAbanpqDpoucQQepm5klG6kj6uwtA"
+      }
+    }
   ]
 }

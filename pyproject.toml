@@ -17,7 +17,7 @@ priority = "explicit"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-flask = "<3"
+flask = "<4"
 requests = "^2.31.0"
 azure-storage-blob = "^12.19.1"
 python-decouple = "^3.8"

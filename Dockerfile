@@ -1,4 +1,4 @@
-FROM ghcr.io/binkhq/python:3.11
+FROM ghcr.io/binkhq/python:3.12
 ARG PIP_INDEX_URL
 ARG APP_NAME
 ARG APP_VERSION
